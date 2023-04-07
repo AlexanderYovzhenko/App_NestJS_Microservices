@@ -1,5 +1,4 @@
 import { NestFactory, HttpAdapterHost } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { config } from './docs/doc-config';
 import { ValidationPipe } from '@nestjs/common/pipes';
@@ -7,9 +6,10 @@ import { loggerWinston } from './utils/logger-winston.config';
 import { LoggingInterceptor } from './utils/logger.middleware';
 import { AllExceptionsFilter } from './exception-filters/all-exceptions.filter';
 import { ConfigService } from '@nestjs/config';
+import { ProfileModule } from './profile.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create(ProfileModule, {
     logger: loggerWinston,
   });
 

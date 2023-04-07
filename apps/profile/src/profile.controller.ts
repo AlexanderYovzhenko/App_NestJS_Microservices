@@ -13,7 +13,8 @@ import {
 import { ProfileService } from './profile.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { AuthGuard } from 'src/guards/jwt-auth.guard';
+import { CheckUserDto } from './dto/check-user.dto';
+import { AuthGuard } from './guards/jwt-auth.guard';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -21,11 +22,25 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-@ApiTags('Profile')
+@ApiTags('Endpoints')
 @ApiBearerAuth()
 @Controller()
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
+
+  @ApiOperation({ summary: 'Проверить сервер' })
+  @ApiResponse({ status: HttpStatus.OK })
+  @Get()
+  getCheckServer(): string {
+    return this.profileService.getCheckServer();
+  }
+
+  @ApiOperation({ summary: 'Получить токен' })
+  @ApiResponse({ status: HttpStatus.CREATED })
+  @Post('login')
+  checkAuthUser(@Body() checkUser: CheckUserDto) {
+    return this.profileService.checkAuthUser(checkUser);
+  }
 
   @ApiOperation({ summary: 'Создать пользователя' })
   @ApiResponse({ status: HttpStatus.CREATED })

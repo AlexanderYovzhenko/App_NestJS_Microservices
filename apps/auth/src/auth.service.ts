@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ForbiddenException } from '@nestjs/common/exceptions';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcryptjs';
@@ -20,47 +19,21 @@ export class AuthService {
   async checkAuthUser(checkUser: CheckUserDto) {
     const { email, password } = checkUser;
 
-    const user = await this.checkUserEmail(email);
+    const user = await this.getUserEmail(email);
 
     if (!user) {
-      throw new ForbiddenException('Wrong login/password combination');
+      return null;
     }
 
     const isMatch = await this.checkHashPassword(password, user);
 
     if (!isMatch) {
-      throw new ForbiddenException('Wrong login/password combination');
+      return null;
     }
 
     const token = await this.generateToken(user);
 
     return token;
-  }
-
-  async checkUserEmail(email: string) {
-    const user = await this.userRepository.findOne({
-      where: { email },
-      include: { all: true },
-    });
-
-    return user;
-  }
-
-  async getOneUser(user_id: number) {
-    const user = await this.userRepository.findOne({
-      where: { user_id },
-      include: { all: true },
-    });
-
-    return user;
-  }
-
-  async getAllUsers() {
-    const users = await this.userRepository.findAll({
-      include: { all: true },
-    });
-
-    return users;
   }
 
   async createUser(email: string, password: string) {
@@ -74,13 +47,41 @@ export class AuthService {
     return user;
   }
 
+  async getAllUsers() {
+    const users = await this.userRepository.findAll({
+      include: { all: true },
+    });
+
+    return users;
+  }
+
+  async getOneUser(user_id: number) {
+    const user = await this.userRepository.findOne({
+      where: { user_id },
+      include: { all: true },
+    });
+
+    return user;
+  }
+
+  async getUserEmail(email: string) {
+    const user = await this.userRepository.findOne({
+      where: { email },
+      include: { all: true },
+    });
+
+    return user;
+  }
+
   async updateUser(email: string, password: string, id: number) {
     const hashPassword = await this.hashPassword(password);
 
-    await this.userRepository.update(
+    const checkUpdate = await this.userRepository.update(
       { email, password: hashPassword },
       { where: { user_id: id } },
     );
+
+    return checkUpdate;
   }
 
   async removeUser(id: number) {
@@ -90,8 +91,6 @@ export class AuthService {
       },
       force: true,
     });
-
-    return true;
   }
 
   // generation token
