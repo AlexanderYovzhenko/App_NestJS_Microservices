@@ -13,19 +13,19 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env'],
+      envFilePath: ['./apps/profile/.env'],
     }),
     SequelizeModule.forFeature([Profile]),
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        dialect: configService.get('DB_DIALECT'),
-        host: configService.get('POSTGRES_HOST'),
-        port: configService.get('POSTGRES_PORT'),
-        username: configService.get('POSTGRES_USER'),
-        password: configService.get('POSTGRES_PASSWORD'),
-        database: configService.get('POSTGRES_DB'),
+        dialect: await configService.get('DB_DIALECT'),
+        host: await configService.get('POSTGRES_HOST'),
+        port: await configService.get('POSTGRES_PORT'),
+        username: await configService.get('POSTGRES_USER'),
+        password: await configService.get('POSTGRES_PASSWORD'),
+        database: await configService.get('POSTGRES_DB'),
         models: [Profile],
         autoLoadModels: true,
         synchronize: true,
@@ -35,23 +35,27 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET_KEY'),
+        secret: await configService.get('JWT_SECRET_KEY'),
         signOptions: {
           expiresIn: '24h',
         },
       }),
     }),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
+        imports: [ConfigModule],
+        inject: [ConfigService],
         name: 'AUTH_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'auth_queue',
-          queueOptions: {
-            durable: false,
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [`${await configService.get('RABBITMQ_URL_DOCKER')}`],
+            queue: 'auth_queue',
+            queueOptions: {
+              durable: false,
+            },
           },
-        },
+        }),
       },
     ]),
   ],

@@ -14,7 +14,7 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
-  const PORT = configService.get('PORT');
+  const PORT = await configService.get('PORT');
 
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.enableCors();

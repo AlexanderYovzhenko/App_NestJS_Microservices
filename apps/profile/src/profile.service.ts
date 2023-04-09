@@ -17,9 +17,7 @@ export class ProfileService {
   constructor(
     @InjectModel(Profile) private profileRepository: Repository<Profile>,
     @Inject('AUTH_SERVICE') private authClient: ClientProxy,
-  ) {
-    this.authClient.connect();
-  }
+  ) {}
 
   getCheckServer(): string {
     return 'Server is running!';

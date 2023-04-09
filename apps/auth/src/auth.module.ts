@@ -17,12 +17,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        dialect: configService.get('DB_DIALECT'),
-        host: configService.get('POSTGRES_HOST'),
-        port: configService.get('POSTGRES_PORT'),
-        username: configService.get('POSTGRES_USER'),
-        password: configService.get('POSTGRES_PASSWORD'),
-        database: configService.get('POSTGRES_DB'),
+        dialect: await configService.get('DB_DIALECT'),
+        host: await configService.get('POSTGRES_HOST'),
+        port: await configService.get('POSTGRES_PORT'),
+        username: await configService.get('POSTGRES_USER'),
+        password: await configService.get('POSTGRES_PASSWORD'),
+        database: await configService.get('POSTGRES_DB'),
         models: [User],
         autoLoadModels: true,
         synchronize: true,
@@ -33,7 +33,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET_KEY'),
+        secret: await configService.get('JWT_SECRET_KEY'),
         signOptions: {
           expiresIn: '24h',
         },
