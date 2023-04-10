@@ -1,6 +1,7 @@
 version: "3.7"
 services:
   rabbitmq:
+    container_name: rabbitmq
     image: rabbitmq:3.11-management
     restart: always
     volumes:
@@ -11,6 +12,7 @@ services:
     networks:
       - backend
   postgres:
+    container_name: postgres
     image: postgres:latest
     restart: always
     ports:
@@ -29,6 +31,7 @@ services:
     networks:
       - backend
   profile:
+    container_name: profile
     build:
       context: .
       dockerfile: ./apps/profile/Dockerfile
@@ -50,6 +53,7 @@ services:
     ports:
       - '4000:4000'
   auth:
+    container_name: auth
     build:
       context: .
       dockerfile: ./apps/auth/Dockerfile
